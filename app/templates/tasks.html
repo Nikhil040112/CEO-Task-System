@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Weekly Tasks{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight">Weekly Tasks</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Focus view of tasks planned for the current week.
+    </p>
+  </div>
+  <a href="/tasks/add"
+     class="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-900 transition shadow-sm">
+    <i class="fas fa-plus text-xs"></i>
+    <span>Add task</span>
+  </a>
+</div>
+
+{% if tasks|length == 0 %}
+  <div class="bg-white p-10 rounded-xl shadow-sm border border-dashed border-slate-300 text-center text-slate-500">
+    <i class="fas fa-clipboard-list text-4xl mb-4 text-slate-300"></i>
+    <p class="text-lg font-semibold">No active tasks</p>
+    <p class="text-sm mt-1">You are all caught up. Add a task when you plan something new.</p>
+    <a href="/tasks/add"
+       class="inline-flex mt-4 items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
+      <i class="fa-solid fa-plus text-xs"></i>
+      <span>Add your first task</span>
+    </a>
+  </div>
+{% else %}
+  <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100 text-xs text-slate-500">
+      <span>Showing {{ tasks|length }} active tasks</span>
+      <span class="hidden sm:inline">Mark tasks as done or reschedule directly from here.</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+          <tr>
+            <th class="p-3 sm:p-4 font-medium">Title</th>
+            <th class="p-3 sm:p-4 font-medium">Planned</th>
+            <th class="p-3 sm:p-4 font-medium">Priority</th>
+            <th class="p-3 sm:p-4 font-medium">Status</th>
+            <th class="p-3 sm:p-4 font-medium w-64">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for task in tasks %}
+          <tr class="hover:bg-slate-50/80">
+            <td class="p-3 sm:p-4 align-top">
+              <div class="font-semibold text-slate-900">{{ task.title }}</div>
+            </td>
+
+            <td class="p-3 sm:p-4 align-top whitespace-nowrap text-xs sm:text-sm text-slate-700">
+              {{ task.planned_datetime.strftime("%d %b %Y %I:%M %p") }}
+            </td>
+
+            <td class="p-3 sm:p-4 align-top">
+              {% if task.priority == "High" %}
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-100">
+                  High
+                </span>
+              {% elif task.priority == "Medium" %}
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-100">
+                  Medium
+                </span>
+              {% else %}
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-slate-50 text-slate-700 border border-slate-100">
+                  Low
+                </span>
+              {% endif %}
+            </td>
+
+            <td class="p-3 sm:p-4 align-top">
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-100">
+                {{ task.status }}
+              </span>
+            </td>
+
+            <td class="p-3 sm:p-4 align-top">
+              <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
+
+                <!-- DONE (BOTH ROLES) -->
+                <form method="post" action="/tasks/{{ task.id }}/done">
+                  <button
+                    class="inline-flex items-center gap-1 bg-emerald-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-emerald-700 transition">
+                    <i class="fa-solid fa-check text-[10px]"></i>
+                    <span>Mark done</span>
+                  </button>
+                </form>
+
+                <!-- RESCHEDULE (ASSISTANT ONLY) -->
+                {% if role == "assistant" %}
+                <form method="post"
+                      action="/tasks/{{ task.id }}/reschedule"
+                      class="flex gap-1 items-center">
+                  <input
+                    type="datetime-local"
+                    name="new_planned_datetime"
+                    required
+                    class="border border-slate-200 px-2 py-1 rounded-md text-[11px] sm:text-xs"
+                  />
+                  <button
+                    class="inline-flex items-center gap-1 bg-amber-500 text-white px-2.5 py-1.5 rounded-md text-[11px] sm:text-xs font-semibold hover:bg-amber-600 transition">
+                    <i class="fa-solid fa-clock-rotate-left text-[10px]"></i>
+                    <span>Reschedule</span>
+                  </button>
+                </form>
+                {% endif %}
+
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

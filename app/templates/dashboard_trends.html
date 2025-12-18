@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Weekly Trends{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight">Weekly Execution Trends</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Week-by-week view of planning, completion, and delay.
+    </p>
+  </div>
+  <a href="/dashboard"
+     class="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
+    <i class="fa-solid fa-arrow-left text-xs"></i>
+    <span>Back to dashboard</span>
+  </a>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+  <div class="px-4 py-3 border-b border-slate-100 text-xs text-slate-500">
+    Each row is a week; use completion and on-time % to spot improvement or slippage.
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+        <tr>
+          <th class="p-3 sm:p-4 text-left font-medium">Week</th>
+          <th class="p-3 sm:p-4 text-right font-medium">Planned</th>
+          <th class="p-3 sm:p-4 text-right font-medium">Completed</th>
+          <th class="p-3 sm:p-4 text-right font-medium">Completion %</th>
+          <th class="p-3 sm:p-4 text-right font-medium">On-time %</th>
+          <th class="p-3 sm:p-4 text-right font-medium">Avg delay (hrs)</th>
+          <th class="p-3 sm:p-4 text-right font-medium">Carryover</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for w in trends %}
+        <tr class="hover:bg-slate-50/80">
+          <td class="p-3 sm:p-4 font-semibold text-slate-900 whitespace-nowrap">
+            {{ w.week_start }} → {{ w.week_end }}
+          </td>
+          <td class="p-3 sm:p-4 text-right text-slate-800">
+            {{ w.planned }}
+          </td>
+          <td class="p-3 sm:p-4 text-right text-slate-800">
+            {{ w.completed }}
+          </td>
+          <td class="p-3 sm:p-4 text-right">
+            <span class="inline-flex justify-end font-semibold text-slate-900">
+              {{ w.completion_ratio }}
+            </span>
+          </td>
+          <td class="p-3 sm:p-4 text-right">
+            <span class="inline-flex justify-end font-semibold {% if w.on_time_ratio|float >= 80 %}text-emerald-700{% else %}text-amber-700{% endif %}">
+              {{ w.on_time_ratio }}
+            </span>
+          </td>
+          <td class="p-3 sm:p-4 text-right text-slate-800">
+            {% if w.avg_delay > 0 %}
+              {{ w.avg_delay }}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td class="p-3 sm:p-4 text-right text-slate-800">
+            {{ w.carryover }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

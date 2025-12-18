@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Completed Tasks{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight">Completed Tasks</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      See when tasks were actually finished and how delayed they were.
+    </p>
+  </div>
+  <a href="/tasks"
+     class="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
+    <i class="fa-solid fa-arrow-left text-xs"></i>
+    <span>Back to active tasks</span>
+  </a>
+</div>
+
+{% if tasks|length == 0 %}
+  <div class="bg-white p-10 rounded-xl shadow-sm border border-dashed border-slate-300 text-center text-slate-500">
+    <i class="fas fa-check-circle text-4xl mb-4 text-emerald-400"></i>
+    <p class="text-lg font-semibold">No completed tasks yet</p>
+    <p class="text-sm mt-1">
+      Once you start marking tasks as done, they will show up here with timing details.
+    </p>
+  </div>
+{% else %}
+  <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="px-4 py-3 border-b border-slate-100 text-xs text-slate-500">
+      Status shows whether the task was closed on time or with a delay.
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+          <tr>
+            <th class="p-3 sm:p-4 text-left font-medium">Title</th>
+            <th class="p-3 sm:p-4 text-left font-medium">Planned</th>
+            <th class="p-3 sm:p-4 text-left font-medium">Actual</th>
+            <th class="p-3 sm:p-4 text-center font-medium">Status</th>
+            <th class="p-3 sm:p-4 text-right font-medium">Delay (hrs)</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for task in tasks %}
+          <tr class="hover:bg-slate-50/80">
+            <td class="p-3 sm:p-4 font-semibold text-slate-900">
+              {{ task.title }}
+            </td>
+            <td class="p-3 sm:p-4 whitespace-nowrap text-xs sm:text-sm text-slate-700">
+              {{ task.planned_datetime.strftime("%d %b %Y %I:%M %p") }}
+            </td>
+            <td class="p-3 sm:p-4 whitespace-nowrap text-xs sm:text-sm text-slate-700">
+              {{ task.actual_datetime.strftime("%d %b %Y %I:%M %p") }}
+            </td>
+            <td class="p-3 sm:p-4 text-center">
+              {% if task.status == "Completed" %}
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                  On time
+                </span>
+              {% else %}
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-100">
+                  <span class="h-1.5 w-1.5 rounded-full bg-rose-500 mr-1.5"></span>
+                  Delayed
+                </span>
+              {% endif %}
+            </td>
+            <td class="p-3 sm:p-4 text-right text-slate-800">
+              {% if task.delay_hours %}
+                {{ task.delay_hours }}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

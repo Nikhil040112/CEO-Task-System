@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Add Task{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto">
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h2 class="text-2xl font-bold tracking-tight">Add New Task</h2>
+      <p class="text-sm text-slate-500 mt-1">
+        Create a clear, time-bound task you want to execute this week.
+      </p>
+    </div>
+    <a href="/tasks"
+       class="inline-flex items-center text-sm font-medium text-slate-600 hover:text-slate-900">
+      <i class="fa-solid fa-arrow-left mr-1 text-xs"></i>
+      Back
+    </a>
+  </div>
+
+  <div class="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-slate-100">
+    <form method="post" action="/tasks/create" class="space-y-5">
+      <div>
+        <label class="block text-sm font-semibold mb-1.5">
+          Task title <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          name="title"
+          required
+          class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black placeholder:text-slate-400"
+          placeholder="Example: Review weekly revenue and churn reports"
+        >
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1.5">
+            Planned date & time <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="datetime-local"
+            name="planned_datetime"
+            required
+            class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+          >
+          <p class="mt-1 text-xs text-slate-500">
+            When do you expect to actually work on this?
+          </p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold mb-1.5">
+            Priority
+          </label>
+          <select
+            name="priority"
+            class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+          >
+            <option>Low</option>
+            <option selected>Medium</option>
+            <option>High</option>
+          </select>
+          <p class="mt-1 text-xs text-slate-500">
+            Use “High” only for must-do items.
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold mb-1.5">
+          Description
+        </label>
+        <textarea
+          name="description"
+          rows="3"
+          class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black placeholder:text-slate-400 resize-none"
+          placeholder="Optional context, links, or definition of done."
+        ></textarea>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 pt-3">
+        <button
+          type="submit"
+          class="inline-flex justify-center items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-slate-900 transition shadow-sm"
+        >
+          <i class="fas fa-save text-xs"></i>
+          <span>Create task</span>
+        </button>
+        <a
+          href="/tasks"
+          class="inline-flex justify-center items-center gap-2 border border-slate-200 px-5 py-2.5 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
+        >
+          <i class="fa-solid fa-xmark text-xs"></i>
+          <span>Cancel</span>
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

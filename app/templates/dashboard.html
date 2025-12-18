@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight">Execution Dashboard</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      {{ week_start }} → {{ week_end }}
+    </p>
+  </div>
+
+  <div class="flex flex-wrap gap-2 items-center">
+    <a href="/dashboard/trends"
+       class="inline-flex items-center gap-2 border border-slate-200 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
+      <i class="fa-solid fa-chart-line text-xs"></i>
+      <span>Weekly trend</span>
+    </a>
+
+    <form method="get" action="/dashboard" class="flex gap-2 items-center">
+      <input
+        type="date"
+        name="selected_date"
+        value="{{ selected_date }}"
+        class="border border-slate-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+      >
+      <button
+        class="bg-black text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-slate-900 transition">
+        View
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <!-- Planned -->
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        Planned tasks
+      </span>
+      <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-900/5 text-slate-900 text-xs">
+        <i class="fa-regular fa-calendar-check"></i>
+      </span>
+    </div>
+    <div class="text-2xl font-bold text-slate-900">{{ planned }}</div>
+    <p class="mt-1 text-xs text-slate-500">
+      High priority: <span class="font-semibold text-slate-800">{{ high_priority_total }}</span>
+    </p>
+  </div>
+
+  <!-- Completed -->
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        Completed
+      </span>
+      <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 text-xs">
+        <i class="fa-solid fa-check"></i>
+      </span>
+    </div>
+    <div class="text-2xl font-bold text-slate-900">{{ completed }}</div>
+    <p class="mt-1 text-xs text-slate-500">
+      Completion rate:
+      <span class="font-semibold text-emerald-700">{{ completion_ratio }}</span>
+    </p>
+  </div>
+
+  <!-- On-time -->
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        On-time execution
+      </span>
+      <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-sky-50 text-sky-600 text-xs">
+        <i class="fa-regular fa-clock"></i>
+      </span>
+    </div>
+    <div class="text-2xl font-bold text-slate-900">{{ on_time_ratio }}</div>
+    <p class="mt-1 text-xs text-slate-500">
+      Avg delay:
+      <span class="font-semibold text-slate-800">{{ avg_delay }} hrs</span>
+    </p>
+  </div>
+
+  <!-- Carryover -->
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        Carryover risk
+      </span>
+      <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-50 text-amber-600 text-xs">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </span>
+    </div>
+    <div class="text-2xl font-bold text-slate-900">{{ carryover }}</div>
+    <p class="mt-1 text-xs text-slate-500">
+      High-priority delayed:
+      <span class="font-semibold text-amber-700">{{ high_priority_delayed }}</span>
+    </p>
+  </div>
+</div>
+{% endblock %}
