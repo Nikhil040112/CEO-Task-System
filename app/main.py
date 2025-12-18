@@ -311,31 +311,3 @@ def completed_tasks(request: Request, db: Session = Depends(get_db)):
         "completed_tasks.html",
         {"request": request, "tasks": completed}
     )
-
-@app.get("/__seed_users")
-def seed_users(db: Session = Depends(get_db)):
-    from passlib.context import CryptContext
-    from app.models import User
-
-    pwd = CryptContext(schemes=["argon2"], deprecated="auto")
-
-    # Check if users already exist
-    if db.query(User).count() > 0:
-        return {"status": "Users already exist"}
-
-    ceo = User(
-        username="Ashwinder01",
-        password=pwd.hash("Ashwinder@01"),
-        role="ceo"
-    )
-
-    assistant = User(
-        username="Muskan01",
-        password=pwd.hash("Muskan@01"),
-        role="assistant"
-    )
-
-    db.add_all([ceo, assistant])
-    db.commit()
-
-    return {"status": "Users created successfully"}
