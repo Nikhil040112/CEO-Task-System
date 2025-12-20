@@ -367,7 +367,7 @@ def check_overdue_tasks(
         "overdue_tasks": len(overdue_tasks)
     }
 
-@app.delete("/admin/cleanup-test-tasks")
+@app.get("/admin/cleanup-test-tasks")
 def cleanup_test_tasks(db: Session = Depends(get_db)):
     test_keywords = [
         "test",
