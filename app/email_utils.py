@@ -1,42 +1,33 @@
 import os
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import requests
 
-SMTP_HOST = os.getenv("SMTP_HOST")
-SMTP_PORT = int(os.getenv("SMTP_PORT", 2525))
-SMTP_USER = os.getenv("SMTP_USER")
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 FROM_EMAIL = os.getenv("FROM_EMAIL")
 CEO_EMAIL = os.getenv("CEO_EMAIL")
 
-print("SMTP DEBUG >>>",
-      "HOST=", SMTP_HOST,
-      "PORT=", SMTP_PORT,
-      "USER=", SMTP_USER,
-      "PASS_SET=", bool(SMTP_PASSWORD),
-      "FROM=", FROM_EMAIL)
 
-def send_email(to_email: str, subject: str, html_body: str, cc: str | None = None):
-    # Fail silently but safely
-    if not all([SMTP_HOST, SMTP_USER, SMTP_PASSWORD, FROM_EMAIL]):
+def send_email(to_email: str, subject: str, html_body: str):
+    if not BREVO_API_KEY:
         return
 
-    msg = MIMEMultipart()
-    msg["From"] = FROM_EMAIL
-    msg["To"] = to_email
-    msg["Subject"] = subject
-    if cc:
-        msg["Cc"] = cc
+    sender_email = FROM_EMAIL.split("<")[-1].replace(">", "").strip()
 
-    msg.attach(MIMEText(html_body, "html"))
+    url = "https://api.brevo.com/v3/smtp/email"
 
-    recipients = [to_email]
-    if cc:
-        recipients.append(cc)
+    payload = {
+        "sender": {
+            "email": sender_email,
+            "name": "CEO Task System"
+        },
+        "to": [{"email": to_email}],
+        "subject": subject,
+        "htmlContent": html_body
+    }
 
-    # ✅ Render-safe SMTP (Brevo recommended)
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as server:
-        server.starttls()
-        server.login(SMTP_USER, SMTP_PASSWORD)
-        server.sendmail(FROM_EMAIL, recipients, msg.as_string())
+    headers = {
+        "api-key": BREVO_API_KEY,
+        "Content-Type": "application/json"
+    }
+
+    response = requests.post(url, json=payload, headers=headers, timeout=15)
+    response.raise_for_status()
