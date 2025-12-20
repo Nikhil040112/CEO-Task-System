@@ -1,0 +1,17 @@
+name: CEO Task Overdue Reminder
+
+on:
+  schedule:
+    # Runs daily at 9:30 AM IST (04:00 UTC)
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+jobs:
+  trigger-overdue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call overdue endpoint
+        run: |
+          curl -X GET \
+            -H "X-CRON-SECRET: ${{ secrets.CRON_SECRET }}" \
+            https://ceo-task-system.onrender.com/cron/check-overdue
