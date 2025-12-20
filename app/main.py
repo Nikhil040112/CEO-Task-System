@@ -366,23 +366,3 @@ def check_overdue_tasks(
         "status": "ok",
         "overdue_tasks": len(overdue_tasks)
     }
-
-@app.get("/admin/cleanup-test-tasks")
-def cleanup_test_tasks(db: Session = Depends(get_db)):
-    test_keywords = [
-        "test",
-        "testing",
-        "email test",
-        "mail test"
-    ]
-
-    deleted_count = 0
-
-    for keyword in test_keywords:
-        deleted = db.query(Task).filter(
-            Task.title.ilike(f"%{keyword}%")
-        ).delete(synchronize_session=False)
-        deleted_count += deleted
-
-    db.commit()
-    return {"deleted_tasks": deleted_count}
