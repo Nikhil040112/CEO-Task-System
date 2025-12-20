@@ -214,10 +214,8 @@ def view_tasks(request: Request, db: Session = Depends(get_db)):
         "status": get_task_status(t)
     } for t in tasks]
 
-    return templates.TemplateResponse(
-        "tasks.html",
-        {"request": request, "tasks": task_data}
-    )
+    return templates.TemplateResponse("tasks.html",{"request": request,"tasks": task_data,"role": request.session.get("role")})
+
 
 @app.get("/tasks/add", response_class=HTMLResponse)
 def add_task_form(request: Request):
