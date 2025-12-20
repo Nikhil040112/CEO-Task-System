@@ -1,10 +1,10 @@
-import smtplib
 import os
+import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 SMTP_HOST = os.getenv("SMTP_HOST")
-SMTP_PORT = int(os.getenv("SMTP_PORT", 465))
+SMTP_PORT = int(os.getenv("SMTP_PORT", 2525))
 SMTP_USER = os.getenv("SMTP_USER")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 FROM_EMAIL = os.getenv("FROM_EMAIL")
@@ -12,6 +12,7 @@ CEO_EMAIL = os.getenv("CEO_EMAIL")
 
 
 def send_email(to_email: str, subject: str, html_body: str, cc: str | None = None):
+    # Fail silently but safely
     if not all([SMTP_HOST, SMTP_USER, SMTP_PASSWORD, FROM_EMAIL]):
         return
 
@@ -28,7 +29,8 @@ def send_email(to_email: str, subject: str, html_body: str, cc: str | None = Non
     if cc:
         recipients.append(cc)
 
-    # 🔐 SSL connection (Render-safe)
-    with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT) as server:
+    # ✅ Render-safe SMTP (Brevo recommended)
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as server:
+        server.starttls()
         server.login(SMTP_USER, SMTP_PASSWORD)
         server.sendmail(FROM_EMAIL, recipients, msg.as_string())
