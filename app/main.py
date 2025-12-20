@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from fastapi import FastAPI, Depends, Request, Form, HTTPException
+from fastapi import FastAPI, Depends, Request, Form, HTTPException, Header
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -11,7 +11,7 @@ from passlib.context import CryptContext
 from app.database import Base, engine, get_db
 from app.models import Task, User
 from app.utils import get_task_status, get_week_range
-
+from app.email_utils import send_email, CEO_EMAIL
 # -------------------------
 # ENV
 # -------------------------
@@ -235,13 +235,27 @@ def create_task(
 ):
     require_login(request)
 
-    db.add(Task(
+    task = Task(
         title=title,
         description=description,
         planned_datetime=planned_datetime,
         priority=priority
-    ))
+    )
+    db.add(task)
     db.commit()
+    db.refresh(task)
+
+    # 📧 EMAIL NOTIFICATION
+    send_email(
+        to_email=CEO_EMAIL,  # CEO gets notified
+        subject="🆕 New Task Added",
+        html_body=f"""
+        <h3>New Task Created</h3>
+        <p><b>Title:</b> {task.title}</p>
+        <p><b>Planned Time:</b> {task.planned_datetime}</p>
+        <p><b>Priority:</b> {task.priority}</p>
+        """
+    )
 
     return RedirectResponse("/tasks", status_code=302)
 
@@ -311,3 +325,46 @@ def completed_tasks(request: Request, db: Session = Depends(get_db)):
         "completed_tasks.html",
         {"request": request, "tasks": completed}
     )
+
+CRON_SECRET = os.getenv("CRON_SECRET")
+
+@app.get("/cron/check-overdue")
+def check_overdue_tasks(
+    x_cron_secret: str = Header(None),
+    db: Session = Depends(get_db)
+):
+    """
+    Triggered by GitHub Actions (cron job)
+    Sends email reminders for overdue tasks
+    """
+
+    # 🔐 Security check
+    if CRON_SECRET and x_cron_secret != CRON_SECRET:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    now = datetime.now()
+
+    # 🔍 Find overdue tasks
+    overdue_tasks = db.query(Task).filter(
+        Task.actual_datetime.is_(None),
+        Task.planned_datetime < now
+    ).all()
+
+    # 📧 Send emails
+    for task in overdue_tasks:
+        send_email(
+            to_email=CEO_EMAIL,
+            subject="⚠️ Overdue Task Reminder",
+            html_body=f"""
+            <h3>Overdue Task</h3>
+            <p><b>Title:</b> {task.title}</p>
+            <p><b>Planned Time:</b> {task.planned_datetime}</p>
+            <p><b>Priority:</b> {task.priority}</p>
+            <p>Please review and take action.</p>
+            """
+        )
+
+    return {
+        "status": "ok",
+        "overdue_tasks": len(overdue_tasks)
+    }
