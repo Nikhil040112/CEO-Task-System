@@ -10,6 +10,12 @@ SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 FROM_EMAIL = os.getenv("FROM_EMAIL")
 CEO_EMAIL = os.getenv("CEO_EMAIL")
 
+print("SMTP DEBUG >>>",
+      "HOST=", SMTP_HOST,
+      "PORT=", SMTP_PORT,
+      "USER=", SMTP_USER,
+      "PASS_SET=", bool(SMTP_PASSWORD),
+      "FROM=", FROM_EMAIL)
 
 def send_email(to_email: str, subject: str, html_body: str, cc: str | None = None):
     # Fail silently but safely
