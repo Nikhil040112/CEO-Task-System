@@ -31,6 +31,8 @@
           <th class="p-3 sm:p-4 text-right font-medium">On-time %</th>
           <th class="p-3 sm:p-4 text-right font-medium">Avg delay (hrs)</th>
           <th class="p-3 sm:p-4 text-right font-medium">Carryover</th>
+          <!-- ✅ NEW -->
+          <th class="p-3 sm:p-4 text-right font-medium">Delay %</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
@@ -64,6 +66,20 @@
           </td>
           <td class="p-3 sm:p-4 text-right text-slate-800">
             {{ w.carryover }}
+          </td>
+          <!-- ✅ NEW -->
+          <td class="p-3 sm:p-4 text-right">
+            <span class="font-semibold
+              {% if w.delay_percentage|float >= 30 %}
+                text-rose-700
+              {% elif w.delay_percentage|float >= 10 %}
+                text-amber-700
+              {% else %}
+                text-emerald-700
+              {% endif %}
+            ">
+              {{ w.delay_percentage }}%
+            </span>
           </td>
         </tr>
         {% endfor %}

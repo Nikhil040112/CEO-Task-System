@@ -69,6 +69,7 @@ def compute_weekly_metrics(db: Session, week_start, week_end):
     planned = len(tasks)
     completed = 0
     on_time = 0
+    delayed = 0
     delay_hours = []
     high_priority_total = 0
     high_priority_delayed = 0
@@ -82,6 +83,7 @@ def compute_weekly_metrics(db: Session, week_start, week_end):
             if task.actual_datetime <= task.planned_datetime:
                 on_time += 1
             else:
+                delayed += 1
                 delay = task.actual_datetime - task.planned_datetime
                 delay_hours.append(delay.total_seconds() / 3600)
                 if task.priority == "High":
@@ -90,6 +92,7 @@ def compute_weekly_metrics(db: Session, week_start, week_end):
     carryover = planned - completed
     completion_ratio = round((completed / planned) * 100, 1) if planned else 0
     on_time_ratio = round((on_time / completed) * 100, 1) if completed else 0
+    delay_percentage = round((delayed / completed) * 100, 1) if completed else 0
     avg_delay = round(sum(delay_hours) / len(delay_hours), 2) if delay_hours else 0
 
     return {
@@ -97,6 +100,7 @@ def compute_weekly_metrics(db: Session, week_start, week_end):
         "completed": completed,
         "completion_ratio": completion_ratio,
         "on_time_ratio": on_time_ratio,
+        "delay_percentage": delay_percentage,  # ✅ NEW
         "avg_delay": avg_delay,
         "carryover": carryover,
         "high_priority_total": high_priority_total,

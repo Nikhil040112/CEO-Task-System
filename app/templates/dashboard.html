@@ -100,4 +100,25 @@
     </p>
   </div>
 </div>
+
+<!-- ✅ NEW: Delay Percentage (ADDED, NOTHING MODIFIED ABOVE) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        Delay percentage
+      </span>
+      <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-rose-50 text-rose-600 text-xs">
+        <i class="fa-solid fa-hourglass-half"></i>
+      </span>
+    </div>
+    <div class="text-2xl font-bold text-slate-900">
+      {{ delay_percentage }}%
+    </div>
+    <p class="mt-1 text-xs text-slate-500">
+      Share of delayed completed tasks
+    </p>
+  </div>
+</div>
+
 {% endblock %}
